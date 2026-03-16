@@ -3,10 +3,6 @@ import ScrollLink from '../components/ScrollLink';
 import './Hero.css';
 
 const Hero = () => {
-  const openAssistant = () => {
-    window.dispatchEvent(new CustomEvent('ondavital:open-chat'));
-  };
-
   return (
     <section className="hero">
       <div className="hero-content container">
@@ -30,16 +26,6 @@ const Hero = () => {
             <span>Atencion personalizada</span>
             <span className="dot">•</span>
             <span>Entorno Premium</span>
-          </div>
-          <div className="hero-assistant-preview">
-            <div className="hero-assistant-copy">
-              <span className="hero-assistant-label">Asistente IA integrado</span>
-              <strong>Preguntame por salas, precios o tu primera visita.</strong>
-              <p>Una forma rapida de orientarte antes de reservar o escribir.</p>
-            </div>
-            <button type="button" className="hero-assistant-btn" onClick={openAssistant}>
-              Abrir IA
-            </button>
           </div>
         </div>
         <div className="hero-image-wrapper">

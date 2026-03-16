@@ -49,65 +49,6 @@
   letter-spacing: 0.5px;
 }
 
-.hero-assistant-preview {
-  margin-top: 2rem;
-  max-width: 560px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1.2rem 1.35rem;
-  border: 1px solid rgba(195, 163, 112, 0.24);
-  border-radius: 18px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(250, 247, 240, 0.96)),
-    white;
-  box-shadow: 0 18px 38px rgba(44, 62, 80, 0.08);
-}
-
-.hero-assistant-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.hero-assistant-label {
-  font: 700 0.72rem/1 var(--font-body);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--brand-accent);
-}
-
-.hero-assistant-copy strong {
-  color: var(--brand-primary);
-  font-size: 1rem;
-}
-
-.hero-assistant-copy p {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-.hero-assistant-btn {
-  flex: 0 0 auto;
-  padding: 0.95rem 1.35rem;
-  border-radius: 999px;
-  border: 1px solid rgba(44, 62, 80, 0.12);
-  background: var(--brand-primary);
-  color: white;
-  font: 700 0.82rem/1 var(--font-body);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  box-shadow: 0 14px 28px rgba(44, 62, 80, 0.14);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.hero-assistant-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 34px rgba(44, 62, 80, 0.18);
-}
-
 .dot {
   color: rgba(0, 0, 0, 0.2);
 }
@@ -157,13 +98,6 @@
   .hero-trust {
     justify-content: center;
     flex-wrap: wrap;
-  }
-
-  .hero-assistant-preview {
-    margin-left: auto;
-    margin-right: auto;
-    flex-direction: column;
-    text-align: center;
   }
 
   .hero-image-bg {

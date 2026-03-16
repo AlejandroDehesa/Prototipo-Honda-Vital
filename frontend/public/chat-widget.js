@@ -47,8 +47,14 @@ widget.innerHTML = `
       <button class="og-chat-prompt" type="button" data-prompt="Que ocurre en la primera visita?">Primera visita</button>
     </div>
     <label class="og-chat-voice-toggle">
-      <input id="og-chat-voice-toggle" type="checkbox" ${voiceEnabled ? 'checked' : ''} />
-      <span>Escuchar respuestas</span>
+      <span class="og-chat-voice-copy">
+        <strong>Escuchar respuestas</strong>
+        <small>Activa la voz para oir a David al responder.</small>
+      </span>
+      <span class="og-chat-switch">
+        <input id="og-chat-voice-toggle" type="checkbox" ${voiceEnabled ? 'checked' : ''} />
+        <span class="og-chat-switch-ui" aria-hidden="true"></span>
+      </span>
     </label>
     <form class="og-chat-form" id="og-chat-form">
       <input class="og-chat-input" id="og-chat-input" type="text" placeholder="${config.placeholder}" autocomplete="off" />
