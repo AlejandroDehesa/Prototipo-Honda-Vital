@@ -1,6 +1,20 @@
 .testimonials {
   padding: var(--padding-section);
-  background-color: var(--brand-secondary);
+  position: relative;
+  background:
+    radial-gradient(circle at top right, rgba(195, 163, 112, 0.1), transparent 28%),
+    linear-gradient(180deg, #f6efe5 0%, var(--brand-secondary) 100%);
+}
+
+.testimonials::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(1120px, calc(100% - 10%));
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(44, 62, 80, 0.12), transparent);
 }
 
 .testimonials-header {
@@ -22,9 +36,17 @@
 .testimonial-card {
   background: white;
   padding: 3rem 2rem 2rem;
-  border-radius: 12px;
+  border-radius: 18px;
   position: relative;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+  border: 1px solid rgba(44, 62, 80, 0.06);
+  box-shadow: 0 16px 34px rgba(44, 62, 80, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(195, 163, 112, 0.24);
+  box-shadow: 0 22px 40px rgba(44, 62, 80, 0.08);
 }
 
 .quote-mark {

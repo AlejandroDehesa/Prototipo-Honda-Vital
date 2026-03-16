@@ -1,12 +1,12 @@
 const config = {
   endpoint: 'http://localhost:3001/api/agent/chat',
   title: 'David',
-  subtitle: 'Guia de bienestar y ResoSense',
+  subtitle: 'Asistente de bienestar, salas y primera visita',
   avatarUrl: '/david-hero.jpg',
   placeholder: 'Escribe tu mensaje...',
   launcherLabel: 'IA',
   welcomeMessage:
-    'Hola. Estoy aqui para ayudarte a mirar lo que te ocurre con un poco mas de claridad, presencia y escucha del cuerpo. Que te gustaria explorar?',
+    'Hola. Puedo orientarte sobre salas, precios, primera visita o el enfoque de David. Que te gustaria explorar?',
   ...(window.OPEN_GRAVITY_CONFIG || {})
 };
 
@@ -41,6 +41,11 @@ widget.innerHTML = `
   </div>
   <div class="og-chat-messages" id="og-chat-messages"></div>
   <div class="og-chat-footer">
+    <div class="og-chat-prompts">
+      <button class="og-chat-prompt" type="button" data-prompt="Que sala me recomiendas para un grupo pequeno?">Sala ideal</button>
+      <button class="og-chat-prompt" type="button" data-prompt="Cuales son los precios de las salas?">Precios</button>
+      <button class="og-chat-prompt" type="button" data-prompt="Que ocurre en la primera visita?">Primera visita</button>
+    </div>
     <label class="og-chat-voice-toggle">
       <input id="og-chat-voice-toggle" type="checkbox" ${voiceEnabled ? 'checked' : ''} />
       <span>Escuchar respuestas</span>
@@ -60,6 +65,7 @@ const messagesEl = widget.querySelector('#og-chat-messages');
 const form = widget.querySelector('#og-chat-form');
 const input = widget.querySelector('#og-chat-input');
 const voiceToggle = widget.querySelector('#og-chat-voice-toggle');
+const promptButtons = widget.querySelectorAll('.og-chat-prompt');
 
 function getPreferredVoice() {
   const synth = window.speechSynthesis;
@@ -192,6 +198,13 @@ if (voiceToggle) {
     }
   });
 }
+
+promptButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    input.value = button.dataset.prompt || '';
+    input.focus();
+  });
+});
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
