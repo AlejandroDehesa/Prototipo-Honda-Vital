@@ -13,7 +13,16 @@ const ScrollLink = ({ to, className, children, ...props }) => {
     const scrollToTarget = () => {
       const target = document.getElementById(targetId);
       if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const navbar = document.querySelector('.navbar');
+        const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
+        const extraOffset = 16;
+        const targetTop = target.getBoundingClientRect().top + window.scrollY;
+        const top = Math.max(targetTop - navbarHeight - extraOffset, 0);
+
+        window.scrollTo({
+          top,
+          behavior: 'smooth'
+        });
       }
     };
 

@@ -3,7 +3,8 @@ import { saveMessage } from './db.js';
 import { buildAgentMessages } from './messageBuilder.js';
 import { toolsDefinitions, executeTool } from './tools/index.js';
 
-const MAX_ITERATIONS = 5;
+const MAX_ITERATIONS = 3;
+const FAST_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
 
 export async function agentLoop(userId: string, userMessage: string): Promise<string> {
   const groqApiKey = process.env.GROQ_API_KEY;
@@ -23,7 +24,7 @@ export async function agentLoop(userId: string, userMessage: string): Promise<st
     try {
       const response = await groq.chat.completions.create({
         messages,
-        model: 'llama-3.3-70b-versatile',
+        model: FAST_MODEL,
         tools: toolsDefinitions,
         tool_choice: 'auto',
         temperature: 0.2

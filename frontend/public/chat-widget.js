@@ -2,8 +2,9 @@ const config = {
   endpoint: 'http://localhost:3001/api/agent/chat',
   title: 'David',
   subtitle: 'Guia de bienestar y ResoSense',
+  avatarUrl: '/david-hero.jpg',
   placeholder: 'Escribe tu mensaje...',
-  launcherLabel: 'Chat',
+  launcherLabel: 'IA',
   welcomeMessage:
     'Hola. Estoy aqui para ayudarte a mirar lo que te ocurre con un poco mas de claridad, presencia y escucha del cuerpo. Que te gustaria explorar?',
   ...(window.OPEN_GRAVITY_CONFIG || {})
@@ -29,9 +30,12 @@ widget.id = 'og-chat-widget';
 widget.className = 'og-hidden';
 widget.innerHTML = `
   <div class="og-chat-header">
-    <div>
-      <h3>${config.title}</h3>
-      <p>${config.subtitle}</p>
+    <div class="og-chat-header-main">
+      <img class="og-chat-avatar og-chat-avatar-header" src="${config.avatarUrl}" alt="${config.title}" />
+      <div>
+        <h3>${config.title}</h3>
+        <p>${config.subtitle}</p>
+      </div>
     </div>
     <button class="og-chat-close" type="button" aria-label="Cerrar chat">x</button>
   </div>
@@ -124,15 +128,28 @@ function speakText(text) {
 }
 
 function addMessage(text, role, extraClass = '') {
+  const wrapper = document.createElement('div');
+  wrapper.className = `og-msg-row ${role === 'user' ? 'og-msg-row-user' : 'og-msg-row-bot'}`;
+
+  if (role === 'bot') {
+    const avatar = document.createElement('img');
+    avatar.className = 'og-chat-avatar og-chat-avatar-msg';
+    avatar.src = config.avatarUrl;
+    avatar.alt = config.title;
+    wrapper.appendChild(avatar);
+  }
+
   const div = document.createElement('div');
   div.className = `og-msg ${role === 'user' ? 'og-msg-user' : 'og-msg-bot'} ${extraClass}`.trim();
   div.textContent = text;
-  messagesEl.appendChild(div);
+  wrapper.appendChild(div);
+
+  messagesEl.appendChild(wrapper);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   if (role === 'bot' && !extraClass.includes('og-typing')) {
     speakText(text);
   }
-  return div;
+  return wrapper;
 }
 
 if (config.welcomeMessage) {
@@ -149,6 +166,11 @@ if ('speechSynthesis' in window) {
 }
 
 launcher.addEventListener('click', () => {
+  widget.classList.remove('og-hidden');
+  input.focus();
+});
+
+window.addEventListener('ondavital:open-chat', () => {
   widget.classList.remove('og-hidden');
   input.focus();
 });

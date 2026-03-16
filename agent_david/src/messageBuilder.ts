@@ -3,7 +3,7 @@ import { styleExamples } from './examples.js';
 import { systemPersona } from './persona.js';
 
 export function buildAgentMessages(userId: string) {
-  const history = getMessages(userId, 10);
+  const history = getMessages(userId, 4);
 
   return [
     {

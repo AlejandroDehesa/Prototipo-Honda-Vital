@@ -8,10 +8,16 @@
 }
 
 .nav-container {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
   padding: 0 5%;
+}
+
+.logo {
+  justify-self: center;
+  text-align: center;
+  transform: translateX(-96px);
 }
 
 .logo a {
@@ -27,10 +33,69 @@
   font-weight: 400;
 }
 
+.nav-assistant {
+  justify-self: center;
+}
+
+.nav-ia-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 126px;
+  padding: 0.95rem 1.85rem 0.9rem;
+  border: 1px solid rgba(195, 163, 112, 0.28);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top, rgba(195, 163, 112, 0.18), transparent 55%),
+    linear-gradient(180deg, var(--brand-primary) 0%, var(--brand-primary) 100%);
+  color: white;
+  cursor: pointer;
+  box-shadow:
+    0 14px 34px rgba(44, 62, 80, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-ia-btn::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.nav-ia-eyebrow {
+  font: 600 0.55rem/1 'Montserrat', sans-serif;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: white;
+}
+
+.nav-ia-title {
+  font: 700 1.2rem/1 var(--font-body);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.nav-ia-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(195, 163, 112, 0.45);
+  box-shadow:
+    0 18px 40px rgba(44, 62, 80, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
 .nav-links {
+  justify-self: center;
   display: flex;
   align-items: center;
   gap: 2rem;
+  justify-content: center;
+  flex-wrap: nowrap;
+  transform: translateX(96px);
 }
 
 .nav-links a {
@@ -49,6 +114,24 @@
 }
 
 @media (max-width: 768px) {
+  .nav-container {
+    grid-template-columns: 1fr auto;
+  }
+
+  .logo,
+  .nav-links {
+    transform: none;
+  }
+
+  .nav-assistant {
+    justify-self: end;
+  }
+
+  .nav-ia-btn {
+    min-width: 108px;
+    padding: 0.85rem 1.4rem;
+  }
+
   .nav-links {
     display: none; /* Mobile menu needed later */
   }
