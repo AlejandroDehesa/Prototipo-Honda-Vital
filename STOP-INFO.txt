@@ -1,0 +1,9 @@
+Para cerrar todo:
+
+- cierra las tres ventanas que abre `start-ondavital.bat`
+- o pulsa `Ctrl + C` dentro de cada una
+
+URL de la web:
+
+- usa la URL que muestre Vite en la ventana de frontend
+- normalmente sera http://localhost:5173

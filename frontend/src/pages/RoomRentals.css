@@ -1,0 +1,161 @@
+.room-rentals-container {
+  padding: 84px 20px 96px;
+  max-width: 1280px;
+  margin: 0 auto;
+  color: #243140;
+}
+
+.rentals-header {
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto 54px;
+}
+
+.rentals-eyebrow {
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #7c6743;
+  font-size: 0.78rem;
+}
+
+.rentals-header h1 {
+  font-size: clamp(2.8rem, 5vw, 4.6rem);
+  margin-bottom: 16px;
+}
+
+.rentals-header p:last-child {
+  color: #5d6a78;
+  font-size: 1.08rem;
+  line-height: 1.8;
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+.room-card {
+  background: #fff;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(44, 62, 80, 0.08);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.room-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.12);
+}
+
+.room-image {
+  height: 280px;
+  background-size: cover;
+  background-position: center;
+}
+
+.room-info {
+  padding: 26px;
+}
+
+.room-badge {
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #f5efe4;
+  color: #7c6743;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+.room-info h3 {
+  font-size: 1.7rem;
+  margin-bottom: 8px;
+}
+
+.room-info .specs {
+  color: #7b8794;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.room-info .description {
+  color: #52606d;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.features li {
+  background: #f7f8fa;
+  color: #44515f;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+}
+
+.room-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+}
+
+.room-capacity span {
+  display: block;
+  color: #7b8794;
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.room-capacity strong {
+  font-size: 0.95rem;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+.book-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 132px;
+  padding: 13px 18px;
+  background: #2c3e50;
+  color: #fff;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+.book-btn:hover {
+  background: #1f2f3f;
+}
+
+@media (max-width: 720px) {
+  .room-rentals-container {
+    padding: 56px 16px 72px;
+  }
+
+  .room-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .book-btn {
+    width: 100%;
+  }
+}

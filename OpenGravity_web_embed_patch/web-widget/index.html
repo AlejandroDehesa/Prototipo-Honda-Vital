@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenGravity Widget Preview</title>
+  <link rel="stylesheet" href="./chat-widget.css" />
+</head>
+<body>
+  <script>
+    window.OPEN_GRAVITY_CONFIG = {
+      endpoint: '/api/agent/chat',
+      title: 'OpenGravity',
+      subtitle: 'Asistente integrado',
+      placeholder: 'Escribe tu mensaje...',
+      launcherLabel: 'Chat',
+      welcomeMessage: 'Estoy conectado al mismo agente que ya usabas en Discord.'
+    };
+  </script>
+  <script type="module" src="./chat-widget.js"></script>
+</body>
+</html>

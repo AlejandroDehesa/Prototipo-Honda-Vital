@@ -1,0 +1,55 @@
+.navbar {
+  background-color: var(--bg-color);
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+}
+
+.logo a {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+
+.logo-accent {
+  color: var(--brand-accent);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-links a {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.nav-links a:hover {
+  color: var(--brand-primary);
+}
+
+.nav-btn.btn-primary {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  color: white !important; /* Force white text for the navbar button */
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none; /* Mobile menu needed later */
+  }
+}
