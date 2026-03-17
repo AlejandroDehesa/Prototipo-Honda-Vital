@@ -3,6 +3,8 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { bookingPolicies, getRoomById } from '../data/roomsData';
 import './RoomDetail.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const RoomDetail = () => {
   const { roomId } = useParams();
   const room = useMemo(() => getRoomById(roomId), [roomId]);
@@ -22,7 +24,7 @@ const RoomDetail = () => {
   const handleBookingSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const response = await fetch(`${API_URL}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

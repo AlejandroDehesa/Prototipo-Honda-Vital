@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Onda Vital | David Quiropráctico</title>
     <link rel="stylesheet" href="/chat-widget.css" />
+    <script>
+      const agentBaseUrl = '%VITE_AGENT_URL%';
+      const hasInjectedAgentUrl = agentBaseUrl && !agentBaseUrl.includes('%VITE_AGENT_URL%');
+
+      window.OPEN_GRAVITY_CONFIG = {
+        endpoint: hasInjectedAgentUrl
+          ? `${agentBaseUrl}/api/agent/chat`
+          : 'http://localhost:3001/api/agent/chat'
+      };
+    </script>
   </head>
   <body>
     <div id="root"></div>

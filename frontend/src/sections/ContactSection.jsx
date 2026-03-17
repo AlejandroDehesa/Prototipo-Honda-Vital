@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './ContactSection.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const ContactSection = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -25,7 +27,7 @@ const ContactSection = () => {
     setStatusMessage({ text: 'Procesando tu solicitud...', type: 'info' });
 
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      const response = await fetch(`${API_URL}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
