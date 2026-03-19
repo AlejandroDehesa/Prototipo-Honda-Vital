@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSiteContent } from '../context/SiteContentContext';
 import './ContactSection.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const ContactSection = () => {
+  const { sections } = useSiteContent();
+  const contact = sections.contact || {};
+  const serviceOptions = contact.serviceOptions || [];
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    service: 'quiropractica',
+    service: serviceOptions[0]?.value || 'quiropractica',
     message: ''
   });
-
   const [statusMessage, setStatusMessage] = useState({ text: '', type: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setFormData((current) => ({
+      ...current,
+      service: current.service || serviceOptions[0]?.value || 'quiropractica'
+    }));
+  }, [serviceOptions]);
 
   const handleChange = (e) => {
     setFormData({
@@ -39,52 +49,72 @@ const ContactSection = () => {
 
       if (response.ok) {
         setStatusMessage({ text: data.message, type: 'success' });
-        setFormData({ name: '', email: '', service: 'quiropractica', message: '' });
+        setFormData({
+          name: '',
+          email: '',
+          service: serviceOptions[0]?.value || 'quiropractica',
+          message: ''
+        });
       } else {
-        setStatusMessage({ text: data.message || 'Ha ocurrido un error. Intentalo de nuevo.', type: 'error' });
+        setStatusMessage({
+          text: data.message || 'Ha ocurrido un error. Intentalo de nuevo.',
+          type: 'error'
+        });
       }
     } catch (error) {
       console.error('Network error during contact submission:', error);
-      setStatusMessage({ text: 'Error de conexion con el servidor. Por favor, intenta de nuevo.', type: 'error' });
+      setStatusMessage({
+        text: 'Error de conexion con el servidor. Por favor, intenta de nuevo.',
+        type: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const locationLines = contact.locationLines || [];
+  const contactLines = contact.contactLines || [];
+  const scheduleLines = contact.scheduleLines || [];
+
   return (
     <section id="contacto" className="contact-section">
       <div className="container contact-container">
         <div className="contact-info">
-          <h2>Da el primer paso hacia tu bienestar.</h2>
-          <p>
-            Estoy aqui para escucharte, evaluar tu situacion y trazar un plan de accion claro.
-            Escribeme o agenda tu primera visita. Las plazas son limitadas para garantizar la
-            maxima calidad en cada sesion.
-          </p>
+          <h2>{contact.title}</h2>
+          <p>{contact.description}</p>
 
           <div className="contact-details">
             <div className="detail-item">
-              <h4>Ubicacion</h4>
+              <h4>{contact.locationTitle || 'Ubicacion'}</h4>
               <p>
-                Centro Onda Vital
-                <br />
-                Calle Premium 123, Madrid
+                {locationLines.map((line) => (
+                  <React.Fragment key={line}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
               </p>
             </div>
             <div className="detail-item">
-              <h4>Contacto</h4>
+              <h4>{contact.contactTitle || 'Contacto'}</h4>
               <p>
-                +34 900 000 000
-                <br />
-                david@ondavital.com
+                {contactLines.map((line) => (
+                  <React.Fragment key={line}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
               </p>
             </div>
             <div className="detail-item">
-              <h4>Horarios</h4>
+              <h4>{contact.scheduleTitle || 'Horarios'}</h4>
               <p>
-                Lunes a Viernes
-                <br />
-                9:00 - 14:00 | 16:00 - 20:00
+                {scheduleLines.map((line) => (
+                  <React.Fragment key={line}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
               </p>
             </div>
           </div>
@@ -92,7 +122,7 @@ const ContactSection = () => {
 
         <div className="contact-form-wrapper">
           <form className="contact-form" onSubmit={handleSubmit}>
-            <h3>Agenda tu consulta</h3>
+            <h3>{contact.formTitle || 'Agenda tu consulta'}</h3>
 
             <div className="form-group">
               <label htmlFor="name">Nombre</label>
@@ -107,10 +137,11 @@ const ContactSection = () => {
             <div className="form-group">
               <label htmlFor="service">Motivo principal</label>
               <select id="service" name="service" value={formData.service} onChange={handleChange}>
-                <option value="quiropractica">Primera Visita Quiropractica</option>
-                <option value="resosense">Sesion Resosense</option>
-                <option value="salas">Informacion Alquiler de Salas</option>
-                <option value="otros">Otras consultas</option>
+                {serviceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -130,8 +161,8 @@ const ContactSection = () => {
             )}
 
             <p className="form-disclaimer">
-              Al enviar, aceptas politica de privacidad. Este formulario no sustituye el consejo
-              medico profesional.
+              {contact.formDisclaimer ||
+                'Al enviar, aceptas politica de privacidad. Este formulario no sustituye el consejo medico profesional.'}
             </p>
           </form>
         </div>

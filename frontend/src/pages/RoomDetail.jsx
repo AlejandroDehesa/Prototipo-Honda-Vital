@@ -1,13 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { bookingPolicies, getRoomById } from '../data/roomsData';
+import { useSiteContent } from '../context/SiteContentContext';
 import './RoomDetail.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const RoomDetail = () => {
   const { roomId } = useParams();
-  const room = useMemo(() => getRoomById(roomId), [roomId]);
+  const { sections, rooms } = useSiteContent();
+  const bookingPolicies = sections.bookingPolicies?.items || [];
+  const room = useMemo(() => rooms.find((item) => item.id === roomId), [roomId, rooms]);
   const [bookingData, setBookingData] = useState({
     name: '',
     email: '',
@@ -16,6 +18,10 @@ const RoomDetail = () => {
   });
   const [message, setMessage] = useState('');
   const [activeImage, setActiveImage] = useState(room?.heroImageIndex ?? 0);
+
+  useEffect(() => {
+    setActiveImage(room?.heroImageIndex ?? 0);
+  }, [room]);
 
   if (!room) {
     return <Navigate to="/alquiler-salas" replace />;
@@ -65,7 +71,7 @@ const RoomDetail = () => {
             <div>
               <span>Espacio</span>
               <strong>
-                {room.specs} · {room.size}
+                {room.specs} • {room.size}
               </strong>
             </div>
             <div>
@@ -85,7 +91,7 @@ const RoomDetail = () => {
             style={{ backgroundImage: `url(${room.images[activeImage]})` }}
           />
           <div className="room-detail-thumbs">
-            {room.images.map((image, index) => (
+            {(room.images || []).map((image, index) => (
               <button
                 key={image}
                 type="button"
@@ -109,7 +115,7 @@ const RoomDetail = () => {
           <article className="room-panel">
             <h2>Equipamiento</h2>
             <ul className="room-feature-list">
-              {room.features.map((feature) => (
+              {(room.features || []).map((feature) => (
                 <li key={feature}>{feature}</li>
               ))}
             </ul>
@@ -121,7 +127,7 @@ const RoomDetail = () => {
             <div className="pricing-section">
               <h3>Precio por hora o por dias</h3>
               <div className="room-pricing-grid">
-                {room.pricing.punctual.map((item) => (
+                {(room.pricing?.punctual || []).map((item) => (
                   <div key={item.label} className="room-price-card">
                     <span>{item.label}</span>
                     <strong>{item.value}</strong>
@@ -133,7 +139,7 @@ const RoomDetail = () => {
             <div className="pricing-section">
               <h3>Plan prepago</h3>
               <div className="room-pricing-grid">
-                {room.pricing.prepaid.map((item) => (
+                {(room.pricing?.prepaid || []).map((item) => (
                   <div key={item.label} className="room-price-card">
                     <span>{item.label}</span>
                     <strong>{item.value}</strong>
@@ -145,7 +151,7 @@ const RoomDetail = () => {
             <div className="pricing-section">
               <h3>Horario fijo semanal</h3>
               <div className="room-pricing-grid">
-                {room.pricing.regular.map((item) => (
+                {(room.pricing?.regular || []).map((item) => (
                   <div key={item.label} className="room-price-card">
                     <span>{item.label}</span>
                     <strong>{item.value}</strong>

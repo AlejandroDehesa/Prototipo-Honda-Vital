@@ -1,31 +1,34 @@
 import React from 'react';
 import ScrollLink from '../components/ScrollLink';
+import { useSiteContent } from '../context/SiteContentContext';
 import './Hero.css';
 
 const Hero = () => {
+  const { sections } = useSiteContent();
+  const hero = sections.hero || {};
+  const trustItems = hero.trustItems || [];
+
   return (
     <section className="hero">
       <div className="hero-content container">
         <div className="hero-text">
-          <h1>Potenciando tu bienestar desde el origen.</h1>
-          <p>
-            Soy David, quiropractico. Mi objetivo es acompanarte a recuperar tu equilibrio natural
-            y mejorar tu calidad de vida mediante un enfoque integral y personalizado.
-          </p>
+          <h1>{hero.title}</h1>
+          <p>{hero.description}</p>
           <div className="hero-actions">
-            <ScrollLink to="#contacto" className="btn-primary">
-              Reserva tu primera visita
+            <ScrollLink to={hero.primaryCtaTarget || '#contacto'} className="btn-primary">
+              {hero.primaryCtaLabel || 'Reserva tu primera visita'}
             </ScrollLink>
-            <ScrollLink to="#filosofia" className="btn-secondary">
-              Conoce mi metodo
+            <ScrollLink to={hero.secondaryCtaTarget || '#filosofia'} className="btn-secondary">
+              {hero.secondaryCtaLabel || 'Conoce mi metodo'}
             </ScrollLink>
           </div>
           <div className="hero-trust">
-            <span>+15 anos de experiencia</span>
-            <span className="dot">•</span>
-            <span>Atencion personalizada</span>
-            <span className="dot">•</span>
-            <span>Entorno Premium</span>
+            {trustItems.map((item, index) => (
+              <React.Fragment key={item}>
+                {index > 0 ? <span className="dot">•</span> : null}
+                <span>{item}</span>
+              </React.Fragment>
+            ))}
           </div>
         </div>
         <div className="hero-image-wrapper">

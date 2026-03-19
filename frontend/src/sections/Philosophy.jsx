@@ -1,31 +1,28 @@
 import React from 'react';
+import { useSiteContent } from '../context/SiteContentContext';
 import './Philosophy.css';
 
 const Philosophy = () => {
+  const { sections } = useSiteContent();
+  const philosophy = sections.philosophy || {};
+  const cards = philosophy.cards || [];
+
   return (
     <section id="filosofia" className="philosophy">
       <div className="container philosophy-container">
         <div className="philosophy-header text-center">
-          <h2>Mi Visión y Método</h2>
-          <p className="subtitle">Más allá del síntoma, buscando la causa.</p>
+          <h2>{philosophy.title}</h2>
+          <p className="subtitle">{philosophy.subtitle}</p>
         </div>
-        
+
         <div className="philosophy-grid">
-          <div className="card">
-            <div className="card-icon">01</div>
-            <h3>Conexión Integral</h3>
-            <p>Entiendo tu cuerpo como un ecosistema donde todo está conectado. No trato partes aisladas, trato a la persona en su totalidad para restaurar su armonía natural.</p>
-          </div>
-          <div className="card">
-            <div className="card-icon">02</div>
-            <h3>Autoridad Tranquila</h3>
-            <p>Con años de experiencia clínica, mi enfoque es directo, basado en ciencia pero profundamente humano. Sentirás que estás en manos seguras y expertas desde el primer instante.</p>
-          </div>
-          <div className="card">
-            <div className="card-icon">03</div>
-            <h3>Acompañamiento</h3>
-            <p>Tu proceso de recuperación u optimización es un camino que recorremos juntos. Te guío, te explico el 'por qué' y te empodero para que mantengas tus resultados.</p>
-          </div>
+          {cards.map((card) => (
+            <div key={`${card.number}-${card.title}`} className="card">
+              <div className="card-icon">{card.number}</div>
+              <h3>{card.title}</h3>
+              <p>{card.text}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
