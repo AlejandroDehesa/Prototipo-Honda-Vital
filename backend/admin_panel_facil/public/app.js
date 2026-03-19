@@ -1,4 +1,5 @@
 const storageKey = 'onda-vital-admin-simple-token';
+const adminBasePath = window.location.pathname.startsWith('/admin-facil') ? '/admin-facil' : '';
 
 const state = {
   token: localStorage.getItem(storageKey) || '',
@@ -101,7 +102,7 @@ async function apiFetch(path, options = {}) {
     headers.set('Authorization', `Bearer ${state.token}`);
   }
 
-  const response = await fetch(path, {
+  const response = await fetch(`${adminBasePath}${path}`, {
     ...options,
     headers
   });

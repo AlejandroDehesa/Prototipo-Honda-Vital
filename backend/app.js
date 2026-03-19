@@ -5,6 +5,10 @@ import dotenv from 'dotenv';
 import contactRoutes from './routes/contact.routes.js';
 import roomRoutes from './routes/room.routes.js';
 import bookingRoutes from './routes/booking.routes.js';
+import {
+  createAdminPanelFacilApp,
+  initializeAdminPanelFacil
+} from './admin_panel_facil/server.js';
 
 
 dotenv.config();
@@ -30,6 +34,7 @@ app.get('/api/status', (req, res) => {
 app.use('/api', contactRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/admin-facil', createAdminPanelFacilApp());
 
 
 // AI Agent Endpoint Stub
@@ -45,6 +50,13 @@ app.post('/api/ai/query', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+initializeAdminPanelFacil()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Failed to initialize backend:', error);
+    process.exit(1);
+  });

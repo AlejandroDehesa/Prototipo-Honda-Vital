@@ -10,6 +10,7 @@ import { defaultRooms, defaultSections } from '../admin_panel/defaultContent.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const isDirectRun = process.argv[1] === __filename;
 
 dotenv.config({ path: join(__dirname, '.env') });
 
@@ -20,6 +21,7 @@ const ADMIN_USER = process.env.ADMIN_PANEL_USER || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PANEL_PASSWORD || 'admin1234';
 const SESSION_TTL_MS = Number(process.env.ADMIN_PANEL_SESSION_HOURS || 8) * 60 * 60 * 1000;
 const sessions = new Map();
+let initializationPromise;
 
 const db = new sqlite3.Database(DB_PATH, (error) => {
   if (error) {
@@ -214,6 +216,14 @@ async function initializeDatabase() {
   }
 }
 
+export function initializeAdminPanelFacil() {
+  if (!initializationPromise) {
+    initializationPromise = initializeDatabase();
+  }
+
+  return initializationPromise;
+}
+
 async function getSections() {
   const rows = await all(`SELECT key, content_json FROM admin_sections ORDER BY key`);
   return rows.reduce((accumulator, row) => {
@@ -290,217 +300,226 @@ setInterval(() => {
   }
 }, 15 * 60 * 1000).unref();
 
-app.use(cors());
-app.use(express.json({ limit: '2mb' }));
-app.use(morgan('dev'));
+export function createAdminPanelFacilApp() {
+  const app = express();
 
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'Simple admin panel API running',
-    timestamp: new Date().toISOString(),
-    usingDefaultCredentials: ADMIN_USER === 'admin' && ADMIN_PASSWORD === 'admin1234'
+  app.use(cors());
+  app.use(express.json({ limit: '2mb' }));
+  app.use(morgan('dev'));
+
+  app.get('/api/health', (req, res) => {
+    res.json({
+      status: 'success',
+      message: 'Simple admin panel API running',
+      timestamp: new Date().toISOString(),
+      usingDefaultCredentials: ADMIN_USER === 'admin' && ADMIN_PASSWORD === 'admin1234'
+    });
   });
-});
 
-app.post('/api/auth/login', (req, res) => {
-  const username = normalizeText(req.body?.username);
-  const password = normalizeText(req.body?.password);
+  app.post('/api/auth/login', (req, res) => {
+    const username = normalizeText(req.body?.username);
+    const password = normalizeText(req.body?.password);
 
-  if (username !== ADMIN_USER || password !== ADMIN_PASSWORD) {
-    res.status(401).json({ status: 'error', message: 'Usuario o contrasena incorrectos.' });
-    return;
-  }
-
-  const token = createSession(username);
-  res.json({ status: 'success', data: { token, user: { username } } });
-});
-
-app.get('/api/auth/me', requireAuth, (req, res) => {
-  res.json({ status: 'success', data: { user: req.user } });
-});
-
-app.post('/api/auth/logout', requireAuth, (req, res) => {
-  sessions.delete(req.authToken);
-  res.json({ status: 'success', message: 'Sesion cerrada.' });
-});
-
-app.get('/api/public/content-bundle', async (req, res) => {
-  try {
-    res.json({
-      status: 'success',
-      data: {
-        sections: await getSections(),
-        rooms: await getRooms(),
-        generatedAt: new Date().toISOString()
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
-
-app.get('/api/admin/dashboard', requireAuth, async (req, res) => {
-  try {
-    res.json({
-      status: 'success',
-      data: {
-        sections: await getSections(),
-        rooms: await getRooms(),
-        bookings: await getBookings()
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
-
-app.put('/api/admin/sections/:key', requireAuth, async (req, res) => {
-  try {
-    const { key } = req.params;
-    if (!(key in defaultSections)) {
-      res.status(404).json({ status: 'error', message: 'Seccion no encontrada.' });
+    if (username !== ADMIN_USER || password !== ADMIN_PASSWORD) {
+      res.status(401).json({ status: 'error', message: 'Usuario o contrasena incorrectos.' });
       return;
     }
 
-    const merged = mergeDefaults(defaultSections[key], req.body || {});
-    await run(
-      `INSERT INTO admin_sections (key, content_json, updated_at)
-       VALUES (?, ?, CURRENT_TIMESTAMP)
-       ON CONFLICT(key) DO UPDATE SET
-         content_json = excluded.content_json,
-         updated_at = CURRENT_TIMESTAMP`,
-      [key, JSON.stringify(merged)]
-    );
+    const token = createSession(username);
+    res.json({ status: 'success', data: { token, user: { username } } });
+  });
 
-    res.json({ status: 'success', message: 'Seccion guardada correctamente.', data: merged });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
+  app.get('/api/auth/me', requireAuth, (req, res) => {
+    res.json({ status: 'success', data: { user: req.user } });
+  });
 
-app.get('/api/admin/rooms', requireAuth, async (req, res) => {
-  try {
-    res.json({ status: 'success', data: await getRooms() });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
+  app.post('/api/auth/logout', requireAuth, (req, res) => {
+    sessions.delete(req.authToken);
+    res.json({ status: 'success', message: 'Sesion cerrada.' });
+  });
 
-app.post('/api/admin/rooms', requireAuth, async (req, res) => {
-  try {
-    const room = normalizeRoomPayload(req.body);
-    const existing = await get(`SELECT id FROM admin_rooms WHERE id = ?`, [room.id]);
-
-    if (existing) {
-      res.status(409).json({ status: 'error', message: 'Ya existe una sala con ese identificador.' });
-      return;
+  app.get('/api/public/content-bundle', async (req, res) => {
+    try {
+      res.json({
+        status: 'success',
+        data: {
+          sections: await getSections(),
+          rooms: await getRooms(),
+          generatedAt: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
     }
+  });
 
-    await run(
-      `INSERT INTO admin_rooms (id, name, content_json, sort_order, updated_at)
-       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      [room.id, room.name, JSON.stringify(room), room.sortOrder]
-    );
-
-    res.status(201).json({ status: 'success', message: 'Sala creada correctamente.', data: room });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
-
-app.put('/api/admin/rooms/:id', requireAuth, async (req, res) => {
-  try {
-    const currentId = req.params.id;
-    const existing = await get(`SELECT id FROM admin_rooms WHERE id = ?`, [currentId]);
-
-    if (!existing) {
-      res.status(404).json({ status: 'error', message: 'Sala no encontrada.' });
-      return;
+  app.get('/api/admin/dashboard', requireAuth, async (req, res) => {
+    try {
+      res.json({
+        status: 'success',
+        data: {
+          sections: await getSections(),
+          rooms: await getRooms(),
+          bookings: await getBookings()
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
     }
+  });
 
-    const room = normalizeRoomPayload(req.body, currentId);
-
-    if (room.id !== currentId) {
-      const duplicate = await get(`SELECT id FROM admin_rooms WHERE id = ?`, [room.id]);
-      if (duplicate) {
-        res.status(409).json({
-          status: 'error',
-          message: 'Ya existe otra sala con el identificador indicado.'
-        });
+  app.put('/api/admin/sections/:key', requireAuth, async (req, res) => {
+    try {
+      const { key } = req.params;
+      if (!(key in defaultSections)) {
+        res.status(404).json({ status: 'error', message: 'Seccion no encontrada.' });
         return;
       }
+
+      const merged = mergeDefaults(defaultSections[key], req.body || {});
+      await run(
+        `INSERT INTO admin_sections (key, content_json, updated_at)
+         VALUES (?, ?, CURRENT_TIMESTAMP)
+         ON CONFLICT(key) DO UPDATE SET
+           content_json = excluded.content_json,
+           updated_at = CURRENT_TIMESTAMP`,
+        [key, JSON.stringify(merged)]
+      );
+
+      res.json({ status: 'success', message: 'Seccion guardada correctamente.', data: merged });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
     }
-
-    await run(
-      `UPDATE admin_rooms
-       SET id = ?, name = ?, content_json = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP
-       WHERE id = ?`,
-      [room.id, room.name, JSON.stringify(room), room.sortOrder, currentId]
-    );
-
-    res.json({ status: 'success', message: 'Sala actualizada correctamente.', data: room });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
-
-app.delete('/api/admin/rooms/:id', requireAuth, async (req, res) => {
-  try {
-    const result = await run(`DELETE FROM admin_rooms WHERE id = ?`, [req.params.id]);
-    if (result.changes === 0) {
-      res.status(404).json({ status: 'error', message: 'Sala no encontrada.' });
-      return;
-    }
-
-    res.json({ status: 'success', message: 'Sala eliminada.' });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
-
-app.patch('/api/admin/bookings/:id/status', requireAuth, async (req, res) => {
-  try {
-    const nextStatus = normalizeText(req.body?.status);
-    if (!['pending', 'approved', 'rejected'].includes(nextStatus)) {
-      res.status(400).json({ status: 'error', message: 'Estado no valido.' });
-      return;
-    }
-
-    const result = await run(`UPDATE bookings SET status = ? WHERE id = ?`, [
-      nextStatus,
-      req.params.id
-    ]);
-
-    if (result.changes === 0) {
-      res.status(404).json({ status: 'error', message: 'Reserva no encontrada.' });
-      return;
-    }
-
-    res.json({ status: 'success', message: `Reserva actualizada a ${nextStatus}.` });
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message });
-  }
-});
-
-const publicDir = join(__dirname, 'public');
-app.use(express.static(publicDir));
-app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    next();
-    return;
-  }
-
-  res.sendFile(join(publicDir, 'index.html'));
-});
-
-initializeDatabase()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Simple admin panel running at http://localhost:${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error('Failed to initialize simple admin panel:', error);
-    process.exit(1);
   });
+
+  app.get('/api/admin/rooms', requireAuth, async (req, res) => {
+    try {
+      res.json({ status: 'success', data: await getRooms() });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  });
+
+  app.post('/api/admin/rooms', requireAuth, async (req, res) => {
+    try {
+      const room = normalizeRoomPayload(req.body);
+      const existing = await get(`SELECT id FROM admin_rooms WHERE id = ?`, [room.id]);
+
+      if (existing) {
+        res.status(409).json({ status: 'error', message: 'Ya existe una sala con ese identificador.' });
+        return;
+      }
+
+      await run(
+        `INSERT INTO admin_rooms (id, name, content_json, sort_order, updated_at)
+         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+        [room.id, room.name, JSON.stringify(room), room.sortOrder]
+      );
+
+      res.status(201).json({ status: 'success', message: 'Sala creada correctamente.', data: room });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  });
+
+  app.put('/api/admin/rooms/:id', requireAuth, async (req, res) => {
+    try {
+      const currentId = req.params.id;
+      const existing = await get(`SELECT id FROM admin_rooms WHERE id = ?`, [currentId]);
+
+      if (!existing) {
+        res.status(404).json({ status: 'error', message: 'Sala no encontrada.' });
+        return;
+      }
+
+      const room = normalizeRoomPayload(req.body, currentId);
+
+      if (room.id !== currentId) {
+        const duplicate = await get(`SELECT id FROM admin_rooms WHERE id = ?`, [room.id]);
+        if (duplicate) {
+          res.status(409).json({
+            status: 'error',
+            message: 'Ya existe otra sala con el identificador indicado.'
+          });
+          return;
+        }
+      }
+
+      await run(
+        `UPDATE admin_rooms
+         SET id = ?, name = ?, content_json = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [room.id, room.name, JSON.stringify(room), room.sortOrder, currentId]
+      );
+
+      res.json({ status: 'success', message: 'Sala actualizada correctamente.', data: room });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  });
+
+  app.delete('/api/admin/rooms/:id', requireAuth, async (req, res) => {
+    try {
+      const result = await run(`DELETE FROM admin_rooms WHERE id = ?`, [req.params.id]);
+      if (result.changes === 0) {
+        res.status(404).json({ status: 'error', message: 'Sala no encontrada.' });
+        return;
+      }
+
+      res.json({ status: 'success', message: 'Sala eliminada.' });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  });
+
+  app.patch('/api/admin/bookings/:id/status', requireAuth, async (req, res) => {
+    try {
+      const nextStatus = normalizeText(req.body?.status);
+      if (!['pending', 'approved', 'rejected'].includes(nextStatus)) {
+        res.status(400).json({ status: 'error', message: 'Estado no valido.' });
+        return;
+      }
+
+      const result = await run(`UPDATE bookings SET status = ? WHERE id = ?`, [
+        nextStatus,
+        req.params.id
+      ]);
+
+      if (result.changes === 0) {
+        res.status(404).json({ status: 'error', message: 'Reserva no encontrada.' });
+        return;
+      }
+
+      res.json({ status: 'success', message: `Reserva actualizada a ${nextStatus}.` });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  });
+
+  const publicDir = join(__dirname, 'public');
+  app.use(express.static(publicDir));
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+      next();
+      return;
+    }
+
+    res.sendFile(join(publicDir, 'index.html'));
+  });
+
+  return app;
+}
+
+if (isDirectRun) {
+  initializeAdminPanelFacil()
+    .then(() => {
+      app.use(createAdminPanelFacilApp());
+      app.listen(PORT, () => {
+        console.log(`Simple admin panel running at http://localhost:${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error('Failed to initialize simple admin panel:', error);
+      process.exit(1);
+    });
+}
