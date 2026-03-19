@@ -1,4 +1,4 @@
-import { bookingPolicies, roomsData } from '../../frontend/src/data/roomsData.js';
+import { bookingPolicies, roomsData } from './roomsData.js';
 
 export const defaultSections = {
   hero: {
