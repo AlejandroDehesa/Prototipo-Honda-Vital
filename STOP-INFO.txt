@@ -1,9 +1,11 @@
 Para cerrar todo:
 
-- cierra las tres ventanas que abre `start-ondavital.bat`
+- cierra las cinco ventanas que abre `start-ondavital.bat`
 - o pulsa `Ctrl + C` dentro de cada una
 
 URL de la web:
 
-- usa la URL que muestre Vite en la ventana de frontend
+- el .bat abre estas tres pestanas automaticamente en el navegador por defecto
 - normalmente sera http://localhost:5173
+- panel admin avanzado: http://localhost:5051
+- panel admin facil: http://localhost:5052
