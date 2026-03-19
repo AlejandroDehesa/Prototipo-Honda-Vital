@@ -248,7 +248,7 @@ form.addEventListener('submit', async (event) => {
     console.error('[OpenGravity Widget] Error:', error);
     typingEl.remove();
     addMessage(
-      'No se pudo conectar con el asistente. Asegurate de que el servicio de David este corriendo en el puerto 3001.',
+      'No se pudo conectar con el asistente. Intentalo de nuevo en unos segundos.',
       'bot'
     );
   }
