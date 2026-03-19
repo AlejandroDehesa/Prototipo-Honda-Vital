@@ -2,8 +2,6 @@ import { Client, GatewayIntentBits, Partials, Events } from 'discord.js';
 import { agentLoop } from './agent.js';
 
 const token = process.env.DISCORD_BOT_TOKEN;
-if (!token) throw new Error('DISCORD_BOT_TOKEN is missing in the environment');
-
 const allowedUserIdsStr = process.env.DISCORD_ALLOWED_USER_IDS || '';
 const allowedUserIds = allowedUserIdsStr.split(',').map(id => id.trim());
 
@@ -63,5 +61,8 @@ client.on(Events.MessageCreate, async (message) => {
 
 // Helper validation function exported just in case
 export function startDiscordBot() {
+  if (!token) {
+    throw new Error('DISCORD_BOT_TOKEN is missing in the environment');
+  }
   client.login(token).catch(console.error);
 }
