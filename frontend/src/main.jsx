@@ -11,7 +11,7 @@ window.OPEN_GRAVITY_CONFIG = {
     : 'http://localhost:3001/api/agent/chat'
 }
 
-await import('/chat-widget.js?v=20260319b')
+void import('./chat-widget.js')
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
